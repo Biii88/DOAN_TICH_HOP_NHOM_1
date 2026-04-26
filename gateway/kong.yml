@@ -1,23 +1,16 @@
-_format_version: "2.1"
+_format_version: "3.0"  # Dùng bản 3.0 cho ổn định với Kong hiện tại
 _transform: true
 
 services:
-
   # =========================
   # ORDER API SERVICE
   # =========================
   - name: order-service
-    url: http://order_api:8000
+    url: http://order-api:5678  # Theo log trước đó của bạn là cổng 5678
     routes:
       - name: order-route
         paths:
           - /orders
-    plugins:
-      - name: key-auth
-      - name: rate-limiting
-        config:
-          minute: 10
-          policy: local
 
   # =========================
   # REPORT SERVICE
@@ -27,17 +20,21 @@ services:
     routes:
       - name: report-route
         paths:
-          - /report
-    plugins:
-      - name: key-auth
-      - name: rate-limiting
-        config:
-          minute: 10
-          policy: local
+          - /api/report  # Sửa lại cho giống trong code Python của bạn
+        strip_path: false # Giữ nguyên path để FastAPI nhận được đúng "/api/report"
+# =========================
+# PLUGINS & CONSUMERS
+# =========================
+# Lưu ý: Mình tạm để key-auth ở đây, bạn phải dùng ?apikey=noah-secret-key để vào nhé
+plugins:
+  - name: key-auth
+    config:
+      key_names: [apikey]
+  - name: rate-limiting
+    config:
+      minute: 10
+      policy: local
 
-# =========================
-# CONSUMER (API KEY)
-# =========================
 consumers:
   - username: client_app
     keyauth_credentials:

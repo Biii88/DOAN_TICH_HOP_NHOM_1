@@ -1,5 +1,0 @@
-__pycache__/
-*.pyc
-data/mysql_data/
-.env
-.DS_Store
