@@ -7,6 +7,8 @@ services:
       MYSQL_DATABASE: webstore
     ports:
       - "3306:3306"
+    networks:
+      - noah-network
 
   # Database PostgreSQL cho Finance
   postgres:
@@ -32,3 +34,38 @@ services:
     build: ./legacy_adapter
     depends_on:
       - mysql-db
+    networks:
+      - noah-network
+
+  # --- MODULE 4: KONG GATEWAY ---
+  kong:
+    image: kong:3.4
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarative/kong.yml
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    networks:
+      - noah-network
+    depends_on:
+      - mysql-db
+
+  # DỊCH VỤ GIẢ (MOCK SERVICES) - Đã sửa 'args' thành 'command'
+  order-api:
+    image: hashicorp/http-echo
+    command: ["-text", '{"message": "Gateway connected to Order API!"}']
+    networks:
+      - noah-network
+
+  report-service:
+    image: hashicorp/http-echo
+    command: ["-text", '{"message": "Gateway connected to Report Service!"}']
+    networks:
+      - noah-network
+
+networks:
+  noah-network:
+    driver: bridge

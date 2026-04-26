@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  mysql-db:  # Thụt lề 2 khoảng trắng
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: web_store
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+
+  legacy-adapter:  # Thụt lề 2 khoảng trắng
+    build: ./legacy_adapter
+    volumes:
+      - ./data/input:/app/input
+      - ./data/processed:/app/processed
+    depends_on:
+      - mysql-db

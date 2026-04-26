@@ -1,0 +1,30 @@
+_format_version: "3.0"
+services:
+  - name: order-api
+    url: http://order-api:5678  # Sửa từ 5000 thành 5678
+    routes:
+      - name: order-route
+        paths:
+          - /orders
+  
+  - name: report-service
+    url: http://report-service:5678 # Sửa từ 8000 thành 5678
+    routes:
+      - name: report-route
+        paths:
+          - /report
+
+plugins:
+  - name: key-auth
+    config:
+      key_names: [apikey]
+  
+  - name: rate-limiting
+    config:
+      minute: 10
+      policy: local
+
+consumers:
+  - username: noah-client
+    keyauth_credentials:
+      - key: noah-secret-key
